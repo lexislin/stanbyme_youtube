@@ -1,45 +1,39 @@
-import streamlit as st
 import pandas as pd
+import streamlit as st
+from collections import Counter
 
-# Load data from Excel files
-video_details = pd.read_excel('video_details_preview.xlsx')
-channel_details = pd.read_excel('channel_details_preview.xlsx')
+# Load video details
+video_details_file = 'video_details_preview.xlsx'
+channel_details_file = 'channel_details_preview.xlsx'
 
-# Set the title of the app
-st.title("YouTube Analysis Dashboard")
+# Read data
+video_df = pd.read_excel(video_details_file)
+channel_df = pd.read_excel(channel_details_file)
 
-# Sidebar for navigation
-st.sidebar.header("Navigation")
-options = st.sidebar.radio("Select a view:", ("Video Details", "Channel Details"))
+# Function to calculate tag frequencies
+def calculate_tag_frequencies(df):
+    tags_list = df['tags'].dropna().tolist()  # Drop NaN values
+    tags_flat = [tag.strip() for tags in tags_list for tag in tags.split(',')]  # Flatten and strip whitespace
+    tag_counts = Counter(tags_flat)
+    return tag_counts
+
+# Streamlit app
+st.title("Video and Channel Insights")
 
 # Display video details
-if options == "Video Details":
-    st.subheader("Video Details")
-    
-    # Show the video details table
-    st.dataframe(video_details)
-
-    # Optionally, visualize some statistics
-    st.write("## Statistics")
-    st.write("Total Videos:", video_details.shape[0])
-    st.write("Total Views:", video_details['viewCount'].sum())
-    st.write("Average Likes:", video_details['likeCount'].mean())
-    st.write("Average Comments:", video_details['commentCount'].mean())
+st.subheader("Video Details")
+st.dataframe(video_df)
 
 # Display channel details
-if options == "Channel Details":
-    st.subheader("Channel Details")
-    
-    # Show the channel details table
-    st.dataframe(channel_details)
+st.subheader("Channel Details")
+st.dataframe(channel_df)
 
-    # Optionally, visualize some statistics
-    st.write("## Statistics")
-    st.write("Total Channels:", channel_details.shape[0])
-    st.write("Total Subscribers:", channel_details['subscriberCount'].sum())
-    st.write("Average Views per Channel:", channel_details['viewCount'].mean())
-    st.write("Average Videos per Channel:", channel_details['videoCount'].mean())
+# Calculate and display tag frequencies
+st.subheader("Tag Frequencies")
+tag_counts = calculate_tag_frequencies(video_df)
+if tag_counts:
+    tag_df = pd.DataFrame(tag_counts.items(), columns=['Tag', 'Frequency'])
+    st.bar_chart(tag_df.set_index('Tag'))
+else:
+    st.write("No tags available.")
 
-# Run the app
-if __name__ == "__main__":
-    st.write("Please select a view from the sidebar.")
