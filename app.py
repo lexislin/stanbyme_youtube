@@ -31,9 +31,13 @@ st.dataframe(channel_df)
 # Calculate and display tag frequencies
 st.subheader("Tag Frequencies")
 tag_counts = calculate_tag_frequencies(video_df)
+
 if tag_counts:
-    tag_df = pd.DataFrame(tag_counts.items(), columns=['Tag', 'Frequency'])
+    # Get the top 20 tags
+    top_tags = tag_counts.most_common(20)
+    tag_df = pd.DataFrame(top_tags, columns=['Tag', 'Frequency'])
+
+    # Display the bar chart with tags on the y-axis
     st.bar_chart(tag_df.set_index('Tag'))
 else:
     st.write("No tags available.")
-
