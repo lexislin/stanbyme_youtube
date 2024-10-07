@@ -33,15 +33,15 @@ st.subheader("Tag Frequencies")
 tag_counts = calculate_tag_frequencies(video_df)
 
 if tag_counts:
-    # Get the 20 most common tags
+    # Get the 20 most common tags sorted by frequency
     top_tags = tag_counts.most_common(20)
     tag_df = pd.DataFrame(top_tags, columns=['Tag', 'Frequency'])
 
     # Sort the DataFrame by frequency in descending order
     tag_df = tag_df.sort_values(by='Frequency', ascending=False)
 
-    # Display the bar chart using Streamlit's built-in function
-    st.bar_chart(tag_df.set_index('Tag'))
+    # Display the horizontal bar chart using Streamlit's built-in function
+    st.bar_chart(tag_df.set_index('Tag').T)  # Transpose to make it horizontal
 
     # Display the counts above the bars
     for i in range(len(tag_df)):
